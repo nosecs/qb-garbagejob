@@ -222,14 +222,14 @@ local function RunWorkLoop()
 
                     if not hasBag and canTakeBag then
                         if Distance < 1.5 then
-                            DrawText3D2(DeliveryData.coords, Lang:t("info.grab_garbage"))
+                            DrawText3D2(DeliveryData.coords, "~g~E~w~ - Grab a garbage bag")
                             if IsControlJustPressed(0, 51) then
 
                                 hasBag = true
                                 TakeAnim()
                             end
                         elseif Distance < 10 then
-                            DrawText3D2(DeliveryData.coords, Lang:t("info.stand_grab_garbage"))
+                            DrawText3D2(DeliveryData.coords, "Stand here to grab a garbage bag.")
                         end
                     else
                         if DoesEntityExist(garbageVehicle) then
@@ -237,13 +237,13 @@ local function RunWorkLoop()
                             local TruckDist = #(pos - Coords)
 
                             if Distance < 10 then
-                                DrawText3D2(DeliveryData.coords, Lang:t("info.garbage_in_truck"))
+                                DrawText3D2(DeliveryData.coords, "Put the bag in your truck..")
                             end
 
                             if TruckDist < 2 then
-                                DrawText3D(Coords.x, Coords.y, Coords.z, Lang:t("info.dispose_garbage"))
-                                if IsControlJustPressed(0, 51) and hasBag then
-                                    QBCore.Functions.Progressbar("deliverbag", Lang:t("info.progressbar"), 2000, false, true, {
+                                DrawText3D(Coords.x, Coords.y, Coords.z, "~g~E~w~ - Dispose of Garbage Bag")
+                                if IsControlJustPressed(0, 51) then
+                                    QBCore.Functions.Progressbar("deliverbag", "Putting bag in trashmaster ..", 2000, false, true, {
                                         disableMovement = true,
                                         disableCarMovement = true,
                                         disableMouse = false,
@@ -259,14 +259,14 @@ local function RunWorkLoop()
                                                     currentStopNum = currentStopNum + 1
                                                     amountOfBags = newBagAmount
                                                     SetGarbageRoute()
-                                                    QBCore.Functions.Notify(Lang:t("info.all_bags"))
+                                                    QBCore.Functions.Notify("All garbage bags are done, proceed to the next location!")
                                                 else
                                                     if hasMoreStops and nextStop == currentStop then
-                                                        QBCore.Functions.Notify(Lang:t("info.depot_issue"))
+                                                        QBCore.Functions.Notify("There was an issue at the depot, please return immediately!")
                                                         amountOfBags = 0
                                                     else
                                                         -- You are done with work here.
-                                                        QBCore.Functions.Notify(Lang:t("info.done_working"))
+                                                        QBCore.Functions.Notify("You are done working! Go back to the depot.")
                                                         isWorking = false
                                                         RemoveBlip(deliveryBlip)
                                                         SetRouteBack()
@@ -279,24 +279,25 @@ local function RunWorkLoop()
                                             -- You haven't delivered all bags here
                                             amountOfBags = amountOfBags - 1
                                             if amountOfBags > 1 then
-                                                QBCore.Functions.Notify(Lang:t("info.bags_left", {value = amountOfBags}))
+                                                QBCore.Functions.Notify("There are still "..amountOfBags.." bags left!")
                                             else
-                                                QBCore.Functions.Notify(Lang:t("info.bags_still", {value = amountOfBags}))
+                                                QBCore.Functions.Notify("There is still "..amountOfBags.." bags over there!")
                                             end
                                             hasBag = false
                                         end
 
                                         DeliverAnim()
                                     end, function() -- Cancel
-                                        QBCore.Functions.Notify(Lang:t("error.cancled"), "error")
+                                        QBCore.Functions.Notify("Canceled", "error")
                                     end)
 
                                 end
                             elseif TruckDist < 10 then
-                                DrawText3D(Coords.x, Coords.y, Coords.z, Lang:t("info.stand_here"))
+                                DrawText3D(Coords.x, Coords.y, Coords.z, "Stand here..")
                             end
                         else
-                            QBCore.Functions.Notify(Lang:t("error.no_truck"), "error")
+                            QBCore.Functions.Notify("You have no truck", "error")
+                            print("You no longer have a truck, contact an admin!")
                             DeliverAnim()
                             hasBag = false
                         end
@@ -334,21 +335,21 @@ CreateThread(function()
                 DrawMarker(2, vehCoords.x, vehCoords.y, vehCoords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 233, 55, 22, 222, false, false, false, true, false, false, false)
                 if distance < 1.5 then
                     if InVehicle then
-                        DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z, Lang:t("info.store_truck"))
+                        DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z, "~g~E~w~ - Store Garbage Truck")
                         if IsControlJustReleased(0, 38) then
                             QBCore.Functions.TriggerCallback('garbagejob:server:EndShift', function(endShift)
                                 if endShift then
                                     BringBackCar()
-                                    QBCore.Functions.Notify(Lang:t("info.truck_returned"))
+                                    QBCore.Functions.Notify("Truck returned, collect your payslip to recieve your pay and deposit back!")
                                 else
-                                    QBCore.Functions.Notify(Lang:t("info.no_deposit"))
+                                    QBCore.Functions.Notify("You have no deposit paid on this vehicle..")
                                     currentStopNum = 0
                                     currentStop = 0
                                 end
                             end, pos)
                         end
                     else
-                        DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z, Lang:t("info.get_truck"))
+                        DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z, "~g~E~w~ - Garbage Truck")
                         if IsControlJustReleased(0, 38) then
                             QBCore.Functions.TriggerCallback('garbagejob:server:NewShift', function(shouldContinue, firstStop, totalBags)
                                 if shouldContinue then
@@ -369,14 +370,14 @@ CreateThread(function()
                                         amountOfBags = totalBags
                                         isWorking = true
                                         SetGarbageRoute()
-                                        QBCore.Functions.Notify(Lang:t("info.deposit_paid", {value = Config.TruckPrice}))
-                                        QBCore.Functions.Notify(Lang:t("info.started"))
+                                        QBCore.Functions.Notify("You have $"..Config.TruckPrice..", deposit paid!")
+                                        QBCore.Functions.Notify("You have started working, location marked on GPS!")
                                         Wait(10)
                                         -- Run the Work Loop to check for Garbo Bags.
                                         RunWorkLoop()
                                     end, coords, true)
                                 else
-                                    QBCore.Functions.Notify(Lang:t("info.not_enough", {value = Config.TruckPrice}))
+                                    QBCore.Functions.Notify("You have not enough money for the deposit.. Deposit costs are $"..Config.TruckPrice)
                                 end
                             end)
                         end
@@ -387,12 +388,12 @@ CreateThread(function()
             if payDistance < 20 then
                 DrawMarker(2, payCoords.x, payCoords.y, payCoords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 233, 55, 22, 222, false, false, false, true, false, false, false)
                 if payDistance < 1.5 then
-                    DrawText3D(payCoords.x, payCoords.y, payCoords.z, Lang:t("info.payslip_collect"))
+                    DrawText3D(payCoords.x, payCoords.y, payCoords.z, "~g~E~w~ - Payslip")
                     if IsControlJustPressed(0, 38) then
                         TriggerServerEvent('garbagejob:server:PayShift')
                     end
                 elseif payDistance < 5 then
-                    DrawText3D(payCoords.x, payCoords.y, payCoords.z, Lang:t("info.payslip"))
+                    DrawText3D(payCoords.x, payCoords.y, payCoords.z, "Payslip")
                 end
             end
 
